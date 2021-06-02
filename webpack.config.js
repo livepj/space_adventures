@@ -6,7 +6,7 @@ const webpack = require("webpack");
 const isDev = process.env.NODE_ENV === 'development';
 module.exports = {
     context: path.resolve(__dirname, 'src'),
-    entry: { main: ['@babel/polyfill', './index.ts'] },
+    entry: { main: ['@babel/polyfill', './index.js'] },
     mode: process.env.NODE_ENV,
     output: {
         filename: `bundle${!isDev ? '.[hash]' : ''}.js`,
@@ -61,7 +61,8 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env']
+                        presets: ['@babel/preset-env'],
+                        plugins: ['@babel/plugin-proposal-class-properties']
                     }
                 }
             }
