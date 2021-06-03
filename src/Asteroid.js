@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 
-export class Asteroid extends PIXI.Container {
+export default class Asteroid extends PIXI.Container {
     constructor(maxY) {
         super()
         this._sprite = PIXI.Sprite.from('asteroid')
