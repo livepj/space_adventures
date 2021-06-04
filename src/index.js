@@ -9,7 +9,7 @@ export const config = {
     width,
     height,
     ammo: 10,
-    enemies: 10,
+    enemies: 5,
     time: 60
 }
 
@@ -37,12 +37,11 @@ async function stop(isWin) {
 
 function start() {
     if (!board) {
-        board = new Board(stop)
+        board = new Board()
         window.board = board
         app.stage.addChildAt(board, 0)
     }
-    board.start()
-    ui.start()
+    Promise.any([board.start(),ui.start()]).then(stop)
 }
 
 export function delay(time) {

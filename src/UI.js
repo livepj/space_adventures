@@ -4,7 +4,7 @@ import { config, delay } from '.'
 const style = { fontSize: 100, fill: 0xffffff }
 
 export default class UI {
-    constructor(callback) {
+    constructor() {
         const { ammo, time, width, height } = config
 
         this._container = new PIXI.Container()
@@ -20,10 +20,10 @@ export default class UI {
         this._timerText.anchor.y = 1
         this.container.addChild(this._timerText)
         this._timer = () => {
-            this._timerText.text = Math.floor((this._time -= PIXI.Ticker.shared.deltaMS / 1000)).toString()
+            this._timerText.text = Math.ceil((this._time -= PIXI.Ticker.shared.deltaMS / 1000)).toString()
             if (this._time <= 0) {
                 stop()
-                callback()
+                this._resolve()
             }
         }
     }
@@ -54,6 +54,9 @@ export default class UI {
         this._timerText.text = time.toString()
         this._time = time
         PIXI.Ticker.shared.add(this._timer)
+        return new Promise(resolve => {
+            this._resolve = resolve
+        })
     }
     stop() {
         PIXI.Ticker.shared.remove(this._timer)
