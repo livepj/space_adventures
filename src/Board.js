@@ -1,17 +1,18 @@
 import * as PIXI from 'pixi.js'
 import { config, ui } from '.'
 import Asteroid from './Asteroid'
+import BulletsFactory from './Bullet'
 import { keyboardHandler } from './KeyboardHandler'
 import Ship from './Ship'
+import Vector from './Vector'
 
 const maxY = 300
-const bulletRadius = 25
 const bulletSpeed = 10
 
 export default class Board extends PIXI.Container {
     constructor() {
         super()
-        this.bulletsPool = []
+        window.Vector = Vector
         this.addChild(PIXI.Sprite.from('background'))
         this._asteroidContainer = new PIXI.Container()
         this._bulletsContainer = new PIXI.Container()
@@ -22,54 +23,51 @@ export default class Board extends PIXI.Container {
         this.ship.position.set(config.width / 2, config.height - this.ship.height / 2 - 30)
         this.addChild(this.ship)
 
+        const bulletsFactory = new BulletsFactory()
         keyboardHandler.onKeyDown('Space', () => {
             if (this._ammo <= 0 || this._stopped) {
                 return
             }
             ui.ammo = --this._ammo
-            const bullet = this.bulletsPool.length ? this.bulletsPool.pop() : new PIXI.Graphics()
-            bullet.beginFill(Math.random() * 0xffffff).drawCircle(0, 0, bulletRadius)
+            const bullet = bulletsFactory.create()
             bullet.position = this.ship.position
             this._bulletsContainer.addChild(bullet)
         })
-        PIXI.Ticker.shared.add(() => {
-            this._checkCollision()
-        })
-    }
-
-    start() {
-        const { ammo, width, enemies } = config
-        this._ammo = ammo
-        for (let i = 0; i < enemies; i++) {
-            const asteroid = i < this._asteroidContainer.children.length ? this._asteroidContainer.getChildAt(i).randomize() : this._asteroidContainer.addChild(new Asteroid(maxY))
-            asteroid.position.set(Math.random() * (width - asteroid.radius * 2) + asteroid.radius, Math.random() * maxY + asteroid.radius)
-        }
-
         PIXI.Ticker.shared.add(delta => {
-            if (this._stopped) return
             for (const bullet of this._bulletsContainer.children) {
-                const y = bullet.y - bulletSpeed * delta
-                if (-y > bulletRadius) {
-                    this._removeBullets(bullet)
+                const newY = bullet.y - bulletSpeed * delta
+                if (-newY > bullet.radius) {
+                    bullet.destroy()
                     if (this._ammo + this._bulletsContainer.children.length < this._asteroidContainer.children.length) {
                         this._endGame(false)
                     }
                     return
                 }
-
-                const target = this._asteroidContainer.children.find(asteroid => this._getDistanse(asteroid.position, { x: bullet.x, y }) < bulletRadius + asteroid.radius)
+                bullet.y = newY
+                const target = this._asteroidContainer.children.find(asteroid => this._checkCirclesCollision(bullet, asteroid))
                 if (target) {
                     target.destroy()
                     if (!this._asteroidContainer.children.length) {
                         this._endGame(true)
                     } else {
-                        this._removeBullets(bullet)
+                        bullet.destroy()
                     }
-                } else {
-                    bullet.y = y
                 }
             }
+            this._checkCollisions()
         })
+    }
+
+    start() {
+        const { ammo, enemies } = config
+        this._ammo = ammo
+        for (let i = 0; i < enemies; i++) {
+            const asteroid = i < this._asteroidContainer.children.length ? this._asteroidContainer.getChildAt(i).randomize() : this._asteroidContainer.addChild(new Asteroid(maxY))
+            this._setRandomAsteroidPosition(asteroid)
+            while (this._asteroidContainer.children.some(otherAsteroid => otherAsteroid != asteroid && this._checkCirclesCollision(asteroid, otherAsteroid))) {
+                this._setRandomAsteroidPosition(asteroid)
+            }
+        }
         this._stopped = false
 
         return new Promise(resolve => {
@@ -81,36 +79,50 @@ export default class Board extends PIXI.Container {
         this._stopped = true
     }
 
-    _checkCollision() {
+    _checkCollisions() {
         const { length } = this._asteroidContainer.children
         this._asteroidContainer.children.forEach((asteroid, i, asteroids) => {
             for (let j = i + 1; j < length; j++) {
                 const otherAsteroid = asteroids[j]
-                const distance = this._getDistanse(asteroid, otherAsteroid)
-                if (distance < asteroid.radius + otherAsteroid.radius) {
-                    //Я думаю, можно легко добавить разные радиусы и считать при помощи них массу, например.
-                    const forceVertor = new PIXI.Point((asteroid.x - otherAsteroid.x) / distance, (asteroid.y - otherAsteroid.y) / distance)
-                    ;[asteroid.vector.x, asteroid.vector.y, otherAsteroid.vector.x, otherAsteroid.vector.y] = [otherAsteroid.vector.x, otherAsteroid.vector.y, asteroid.vector.y, asteroid.vector.x]
+                if (this._checkCirclesCollision(asteroid, otherAsteroid)) {
+                    const relativelyVector = otherAsteroid.vector
+                    otherAsteroid.vector = new Vector()
+                    asteroid.vector.substract(relativelyVector)
+                    
                 }
             }
         })
     }
 
+    /**
+     * @param {{x: number, y: string}} a
+     * @param {{x: number, y: string}} b
+     */
     _getDistanse(a, b) {
         return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
     }
 
-    _removeBullets(...bullets) {
-        if (!bullets.length) {
-            bullets = this._bulletsContainer.children
-        }
-        for (const bullet of bullets) {
-            this.bulletsPool.push(this._bulletsContainer.removeChild(bullet))
-        }
-    }
+    /**
+     * @param {boolean} isWin
+     */
     _endGame(isWin) {
-        this._removeBullets()
+        this._bulletsContainer.children.forEach(bullet => bullet.destroy())
         this._resolve(isWin)
+    }
+
+    /**
+     * @param {{x: number, y: string, radius:number}} a
+     * @param {{x: number, y: string, radius:number}} b
+     */
+    _checkCirclesCollision(a, b) {
+        return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 < (a.radius + b.radius) ** 2 //Квадрат дешевле в плане перфоманса, чем корень
+    }
+
+    /**
+     * @param {Asteroid} asteroid
+     */
+    _setRandomAsteroidPosition(asteroid) {
+        asteroid.position.set(Math.random() * (config.width - asteroid.radius * 2) + asteroid.radius, Math.random() * maxY + asteroid.radius)
     }
 }
 // СДЕЛАТЬ ВЫПУСК ПУЛЬ ВСЕХ ОДНОВРЕМЕННО ПОСЛЕ ВЫСТАВЛЕНИЯ ИХ НА ПОЛЕ. СДЕЛАТЬ УВЕЛИЧЕНИЕ КОЛИЧЕСТВА АСТЕРОИДОВ КАЖДЫЙ РАУНД И СБРАСЫВАТЬ ПРИ ПРОИГРЫШЕ

@@ -24,10 +24,13 @@ export const ui = new UI(async () => {
     await stop()
     start()
 })
-window.UI = ui
+
 app.stage.addChild(ui.container)
 let board
 
+/**
+ * @param {boolean} isWin
+ */
 async function stop(isWin) {
     board.stop()
     ui.stop()
@@ -41,9 +44,12 @@ function start() {
         window.board = board
         app.stage.addChildAt(board, 0)
     }
-    Promise.any([board.start(),ui.start()]).then(stop)
+    Promise.any([board.start(), ui.start()]).then(stop)
 }
 
+/**
+ * @param {number} time
+ */
 export function delay(time) {
     const ticker = PIXI.Ticker.shared
     return new Promise(resolve => {

@@ -1,7 +1,8 @@
 import * as PIXI from 'pixi.js'
 import { config } from '.'
+import Vector from './Vector'
 
-const maxSpeed = 2
+const maxSpeed = 3
 const gravitation = 0.1
 
 export default class Asteroid extends PIXI.Container {
@@ -38,10 +39,7 @@ export default class Asteroid extends PIXI.Container {
         super.destroy({ children: true })
     }
     randomize() {
-        this.vector = new PIXI.Point(getRandomSpeed(), getRandomSpeed())
-        function getRandomSpeed() {
-            return Math.random() * maxSpeed * 2 - maxSpeed
-        }
+        this.vector = Vector.fromDirectionAndLength(Math.PI * 2 * Math.random(), Math.random() * maxSpeed * 2 - maxSpeed)
         return this
     }
 }

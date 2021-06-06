@@ -4,6 +4,7 @@ import { config, delay } from '.'
 const style = { fontSize: 100, fill: 0xffffff }
 
 export default class UI {
+
     constructor() {
         const { ammo, time, width, height } = config
 
@@ -28,6 +29,9 @@ export default class UI {
         }
     }
 
+    /**
+     * @param {string} text
+     */
     async showBigText(text) {
         const { width, height } = config
         const pixiText = new PIXI.Text(text, { fontSize: 200, fill: 0xffffff, fontWeight: 600 })
@@ -48,6 +52,7 @@ export default class UI {
     set ammo(value) {
         this._ammoText.text = value.toString()
     }
+
     start() {
         const { time, ammo } = config
         this.ammo = ammo
