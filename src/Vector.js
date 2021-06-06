@@ -99,4 +99,12 @@ export default class Vector {
     static fromPoint(output) {
         return new Vector(output.x, output.y)
     }
+
+    /**
+     * @param {Vector} a
+     * @param {Vector} b
+     */
+    static scalarMultiply(a, b) {
+        return a.x * b.x + a.y * b.y
+    }
 }

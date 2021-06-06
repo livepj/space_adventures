@@ -85,10 +85,7 @@ export default class Board extends PIXI.Container {
             for (let j = i + 1; j < length; j++) {
                 const otherAsteroid = asteroids[j]
                 if (this._checkCirclesCollision(asteroid, otherAsteroid)) {
-                    const relativelyVector = otherAsteroid.vector
-                    otherAsteroid.vector = new Vector()
-                    asteroid.vector.substract(relativelyVector)
-                    
+                    this._resolveCollision(asteroid, otherAsteroid)
                 }
             }
         })
@@ -124,5 +121,19 @@ export default class Board extends PIXI.Container {
     _setRandomAsteroidPosition(asteroid) {
         asteroid.position.set(Math.random() * (config.width - asteroid.radius * 2) + asteroid.radius, Math.random() * maxY + asteroid.radius)
     }
+    /**
+     * @param {Asteroid} a
+     * @param {Asteroid} b
+     */
+    _resolveCollision(a, b) {
+        const { normal } = new Vector(b.x - a.x, b.y - a.y)
+        const scalar = Vector.scalarMultiply(b.vector.clone().subtract(a.vector), normal)
+
+        if (scalar > 0) return
+
+        normal.multiply(scalar)
+
+        b.vector.subtract(normal)
+        a.vector.add(normal)
+    }
 }
-// СДЕЛАТЬ ВЫПУСК ПУЛЬ ВСЕХ ОДНОВРЕМЕННО ПОСЛЕ ВЫСТАВЛЕНИЯ ИХ НА ПОЛЕ. СДЕЛАТЬ УВЕЛИЧЕНИЕ КОЛИЧЕСТВА АСТЕРОИДОВ КАЖДЫЙ РАУНД И СБРАСЫВАТЬ ПРИ ПРОИГРЫШЕ
