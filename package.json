@@ -1,32 +1,15 @@
 {
-    "name": "space_adventures",
-    "version": "1.0.0",
-    "description": "",
-    "private": true,
-    "scripts": {
-        "dev": "npx cross-env NODE_ENV=development npx webpack",
-        "prod": "npx cross-env NODE_ENV=production npx webpack",
-        "watch": "npx cross-env NODE_ENV=development npx webpack-dev-server --open"
-    },
-    "author": "",
-    "license": "ISC",
-    "devDependencies": {
-        "@babel/core": "^7.12.7",
-        "@babel/polyfill": "^7.12.1",
-        "@babel/preset-env": "^7.12.7",
-        "@babel/preset-typescript": "^7.12.7",
-        "babel-loader": "^8.2.1",
-        "babel-plugin-transform-class-properties": "^6.24.1",
-        "clean-webpack-plugin": "3.0.0",
-        "copy-webpack-plugin": "^6.3.2",
-        "cross-env": "^7.0.2",
-        "eslint": "^7.27.0",
-        "html-webpack-plugin": "4.5.0",
-        "webpack": "4.44.2",
-        "webpack-cli": "3.3.12",
-        "webpack-dev-server": "^3.11.0"
-    },
-    "dependencies": {
-        "pixi.js": "6.0.4"
-    }
+  "name": "space_adventure_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "init": "npm i --prefix .\\client\\",
+    "start": "npm run prod --prefix .\\client\\ && node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
