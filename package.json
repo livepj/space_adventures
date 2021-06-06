@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "init": "npm i --prefix .\\client\\",
-    "start": "npm run prod --prefix .\\client\\ && node index.js"
+    "init": "npm i --prefix client",
+    "start": "npm run prod --prefix client && node index.js"
   },
   "author": "",
   "license": "ISC",

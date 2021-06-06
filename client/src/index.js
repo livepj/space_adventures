@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import Board from './board'
+import Board from './Board'
 import UI from './UI'
 
 const width = 1280
