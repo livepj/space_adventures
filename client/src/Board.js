@@ -92,8 +92,8 @@ export default class Board extends PIXI.Container {
     }
 
     /**
-     * @param {{x: number, y: string}} a
-     * @param {{x: number, y: string}} b
+     * @param {{x: number, y: number}} a
+     * @param {{x: number, y: number}} b
      */
     _getDistanse(a, b) {
         return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
@@ -108,8 +108,8 @@ export default class Board extends PIXI.Container {
     }
 
     /**
-     * @param {{x: number, y: string, radius:number}} a
-     * @param {{x: number, y: string, radius:number}} b
+     * @param {{x: number, y: number, radius:number}} a
+     * @param {{x: number, y: number, radius:number}} b
      */
     _checkCirclesCollision(a, b) {
         return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 < (a.radius + b.radius) ** 2 //Квадрат дешевле в плане перфоманса, чем корень
