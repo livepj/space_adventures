@@ -12,7 +12,6 @@ const bulletSpeed = 10
 export default class Board extends PIXI.Container {
     constructor() {
         super()
-        window.Vector = Vector
         this.addChild(PIXI.Sprite.from('background'))
         this._asteroidContainer = new PIXI.Container()
         this._bulletsContainer = new PIXI.Container()
