@@ -20,10 +20,7 @@ PIXI.Loader.shared.add('background', 'assets/background.png').add('asteroid', 'a
 
 window.PIXI = PIXI
 
-export const ui = new UI(async () => {
-    await stop()
-    start()
-})
+export const ui = new UI()
 
 app.stage.addChild(ui.container)
 let board
@@ -41,7 +38,6 @@ async function stop(isWin) {
 function start() {
     if (!board) {
         board = new Board()
-        window.board = board
         app.stage.addChildAt(board, 0)
     }
     Promise.any([board.start(), ui.start()]).then(stop)
