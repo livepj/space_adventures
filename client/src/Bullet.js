@@ -3,7 +3,7 @@ import * as PIXI from 'pixi.js'
 const pool = []
 export default class BulletsFactory {
     create() {
-        return pool.length ? this.pool.pop().draw() : new Bullet(25)
+        return pool.length ? pool.pop().draw() : new Bullet(25)
     }
 }
 
@@ -22,6 +22,6 @@ class Bullet extends PIXI.Graphics {
     }
     destroy() {
         this.parent.removeChild(this)
-        ;(this.pool ||= []).push(this.clear())
+        pool.push(this.clear())
     }
 }

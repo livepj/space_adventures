@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "cross-env NODE_ENV=development webpack",
         "prod": "cross-env NODE_ENV=production webpack",
-        "watch": "cross-env NODE_ENV=development webpack-dev-server --open"
+        "watch": "cross-env NODE_ENV=development webpack-dev-server --open -d"
     },
     "author": "",
     "license": "ISC",
